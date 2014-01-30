@@ -1,1 +1,1 @@
-// @codekit-prepend "jquery.min.js", "popup.js"
+// @codekit-prepend "jquery-2.1.0.min.js", "_animator.js", "popup.js"
