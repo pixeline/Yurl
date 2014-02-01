@@ -1,6 +1,6 @@
 {
   "name": "YURLS : Your urls made easy",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "manifest_version": 2,
   "description": "Frustrated with the way Chrome lets you find your bookmarks? This extension helps you find your bookmarks easily, and with style...",
   "homepage_url": "http://pixeline.be",
@@ -34,6 +34,5 @@
       "default_icon": "icon16.png",
       "default_popup": "popup.html"
   },
-  "manifest_version": 2,
   "content_security_policy": "script-src 'self' https://ajax.googleapis.com; object-src 'self'"
 }

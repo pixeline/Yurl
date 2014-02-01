@@ -32,7 +32,7 @@ actual styling
 */
   body{
     position:relative;
-	height:auto;
+	height:30px;
     width: 420px;
   	background: #FFF;
   	color:$dark-grey;
@@ -113,6 +113,8 @@ actual styling
         color: $black;
         font-size: 13px;
         line-height: 140%;
+        text-overflow:    ellipsis;
+        white-space: nowrap;
         -webkit-transform: rotateX(-60deg);
         -webkit-transform-origin: 50% 0;
         -webkit-backface-visibility: visible;
