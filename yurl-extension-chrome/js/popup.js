@@ -63,6 +63,23 @@ jQuery(function($) {
 		}, 400);
 		// End keyup callback
 	});
+	
+
+$(document).on('keydown', 'a.bookmark', function(e) {
+	
+    if (e.keyCode===40) {
+        $(this).next('a.bookmark').focus();
+		e.preventDefault();
+		return false;
+    }
+    if (e.keyCode===38) {
+        $(this).prev('a.bookmark').focus();
+        e.preventDefault();
+        return false;
+    }
+    
+});
+	
 	$(document).on('click', 'a.bookmark', function() {
 		chrome.tabs.create({
 			url: $(this).attr('href')
