@@ -855,7 +855,7 @@ jQuery(function($) {
 		var yurl_cache = JSON.parse(localStorage.getItem("yurl"));
 		var now = new Date().getTime().toString();
 		
-		if (yurl_cache.results !== '' && ((now - yurl_cache.timestamp.toString()) < 120000) ) {
+		if ( yurl_cache.results !== null && yurl_cache.timestamp !== null && ((now - yurl_cache.timestamp.toString()) < 120000) ) {
 			$('#search').val(yurl_cache.search);
 			$('#bookmarks')[0].innerHTML = yurl_cache.results;
 		} else {
