@@ -38,11 +38,9 @@ jQuery(function($) {
 		var yurl_cache = JSON.parse(localStorage.getItem("yurl"));
 		var now = new Date().getTime().toString();
 		
-		if ( yurl_cache.results !== null && yurl_cache.timestamp !== null && ((now - yurl_cache.timestamp.toString()) < 120000) ) {
+		if ( yurl_cache && yurl_cache.search && yurl_cache.results && yurl_cache.timestamp && ((now - yurl_cache.timestamp.toString()) < 120000) ) {
 			$('#search').val(yurl_cache.search);
 			$('#bookmarks')[0].innerHTML = yurl_cache.results;
-		} else {
-			localStorage.setItem('yurl', null);
 		}
 	}
 	$('#search').keyup(function() {
@@ -103,7 +101,7 @@ jQuery(function($) {
 	});
 	// Keyboard Interaction
 	$(document).on('keydown', '.bookmark', function(e) {
-		var e = window.event ? event : e;
+		e = window.event ? event : e;
 		if (e.which === 38) {
 			// Arrow Up
 			$(this).prev('.bookmark').focus();
