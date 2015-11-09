@@ -892,7 +892,7 @@ jQuery(function($) {
 	}
 	$('#history').on('click', function() {
 		$('#bookmarks').empty();
-		chrome.bookmarks.getRecent(10, renderTheResults);
+		chrome.bookmarks.getRecent(100, renderTheResults);
 	});
 	$('#search').keyup(function() {
 		delay(function() {
