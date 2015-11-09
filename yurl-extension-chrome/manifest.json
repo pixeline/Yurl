@@ -1,12 +1,12 @@
 {
   "name": "YURLS : Your urls made easy",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "manifest_version": 2,
   "description": "Frustrated with the way Chrome lets you find your bookmarks? This extension helps you find your bookmarks easily, and with style...",
   "homepage_url": "https://chrome.google.com/webstore/detail/yurls-your-urls-made-easy/anpcbhoofnndmkigbbnpcjbdndkcndhg",
   "omnibox": {"keyword": "@"},
   "permissions": [
-    "bookmarks","background"
+    "bookmarks","background","chrome://favicon/"
   ],
   "background": {
     "scripts": ["background.js"],
@@ -34,5 +34,5 @@
       "default_icon": "icon16.png",
       "default_popup": "popup.html"
   },
-  "content_security_policy": "default-src 'unsafe-inline'; script-src 'self'; object-src 'self'"
+  "content_security_policy": "img-src *; default-src 'unsafe-inline'; script-src 'self'; object-src 'self' 'unsafe-inline'"
 }

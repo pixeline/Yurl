@@ -73,8 +73,22 @@ body{
 	}
 	#search{
 		padding:2px;
-		width:180px;
+		width:130px;
 		border:1px solid #FFF;
+	}
+	#history{
+		float:right;
+		background:black;
+		color: $yellow;
+		border: 1px solid black;
+		padding:2px 6px;
+		border-radius: 3px;
+		&:hover,
+		&:active,
+		&:focus{
+			background:$white;
+			color: $black;
+		}
 	}
 }
 
@@ -131,6 +145,11 @@ body{
 			font-weight: normal;
 			padding: 2px 5px;
 			-webkit-backface-visibility: hidden;
+		}
+		img.favicon{
+
+			margin-right:5px;
+			vertical-align: middle;
 		}
 		p {
         	margin: 0;
