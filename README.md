@@ -1,6 +1,10 @@
 # Yurl
 Yurl is a simple chrome extension that helps you search through your bookmarks using a simple "show as you type" search field, and showing you a list of the last 100 bookmarked addresses.
 
+## Installation
+
+Go the [Play store](https://chrome.google.com/webstore/detail/yurls-find-your-urls-easi/anpcbhoofnndmkigbbnpcjbdndkcndhg) and click install.
+
 ## Issues, suggestions?
 Please post any issues and feature requests using Yurl [Github Issues](https://github.com/pixeline/Yurl/issues) page.
 
