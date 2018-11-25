@@ -1,11 +1,11 @@
 var chrome = chrome;
 String.prototype.trunc = String.prototype.trunc ||
-function(n) {
-	return this.length > n ? this.substr(0, n - 1) + '&hellip;' : this;
-};
+	function (n) {
+		return this.length > n ? this.substr(0, n - 1) + '&hellip;' : this;
+	};
 
 function navigate(url) {
-	chrome.tabs.getSelected(null, function(tab) {
+	chrome.tabs.getSelected(null, function (tab) {
 		chrome.tabs.update(tab.id, {
 			url: url
 		});
@@ -15,9 +15,9 @@ function navigate(url) {
 	Small delay to wait for user keydown pausing
 	http://stackoverflow.com/questions/1909441/jquery-keyup-delay
 */
-var delay = (function() {
+var delay = (function () {
 	var timer = 0;
-	return function(callback, ms) {
+	return function (callback, ms) {
 		clearTimeout(timer);
 		timer = setTimeout(callback, ms);
 	};
@@ -25,10 +25,11 @@ var delay = (function() {
 /*
 	Function that renders the bookmark node tree
 */
-renderTheResults = function(results) {
+renderTheResults = function (results) {
 	total = results.length;
 	var str = '';
-	$('#total')[0].innerHTML = total + ' urls';
+	//$('#total')[0].innerHTML = total + ' urls';
+	document.getElementById('total').innerHTML = total + ' urls';
 	if (total > 0) {
 		var html = [];
 		for (var i = 0; i < total; i++) {
@@ -36,24 +37,22 @@ renderTheResults = function(results) {
 			var className = (node.children) ? 'folder' : 'link';
 			if (className !== 'folder' && (typeof node.url !== 'undefined')) {
 				// handle bookmarklets correctly
+				node.url = (node.url.length < 1) ? node.title(substring(0, 1)).toUpperCase() : node.url;
 				node.descr = (node.url.substring(0, 10) === "javascript") ? 'Bookmarklet' : node.url;
-				node.favicon = (node.descr === 'Bookmarklet')?  '': '<img class="favicon" src="chrome://favicon/'+node.url+'"> ';
-				str = '<li tabindex="' + (i + 1) + '" class="bookmark"><a href="' + node.url + '"><h3>'+node.favicon + node.title + '</h3></a><p>' + node.descr.trunc(55, true) + '<span data-bookmark="' + node.id + '" class="delete" title="Delete Bookmark"></span></p></li>';
+				node.favicon = (node.descr === 'Bookmarklet') ? '' : '<img class="favicon" src="chrome://favicon/' + node.url + '"> ';
+				str = '<li tabindex="' + (i + 1) + '" class="bookmark"><a href="' + node.url + '"><h3>' + node.favicon + node.title + '</h3></a><p>' + node.descr.trunc(55, true) + '<span data-bookmark="' + node.id + '" class="delete" title="Delete Bookmark"></span></p></li>';
 				html.push(str);
 			}
 		}
-		myHTMLString = '<ul id="bookmarkslist">' + html.join('') + '</ul>';
+		var myHTMLString = '<ul id="bookmarkslist">' + html.join('') + '</ul>';
 	} else {
-		myHTMLString = '<p class="error">Sorry, no result.</p>';
+		var myHTMLString = '<p class="error">Sorry, no result.</p>';
 	}
 	//THIS IS FASTER THAN JQUERY'S HTML() function
-	$('#bookmarks')[0].innerHTML = myHTMLString;
-	yurl_cache = JSON.stringify({
-		search: query,
-		results: myHTMLString,
-		timestamp: new Date().getTime()
-	});
-	localStorage.setItem('yurl', yurl_cache);
+	document.getElementById('bookmarks').innerHTML = myHTMLString;
+
+
+	//localStorage.setItem('yurl', yurl_cache);
 }
 /*
 
@@ -61,31 +60,48 @@ renderTheResults = function(results) {
 
 */
 // Search the bookmarks when entering the search keyword.
-jQuery(function($) {
+jQuery(function ($) {
 	var query = '',
 		myHTMLString = '',
 		total = 0;
-	if (localStorage.getItem("yurl") !== null) {
-		var yurl_cache = JSON.parse(localStorage.getItem("yurl"));
-		var now = new Date().getTime().toString();
-		if (yurl_cache && yurl_cache.search && yurl_cache.results && yurl_cache.timestamp && ((now - yurl_cache.timestamp.toString()) < 120000)) {
-			$('#search').val(yurl_cache.search);
-			$('#bookmarks')[0].innerHTML = yurl_cache.results;
-		}
-	}
-	$('#history').on('click', function() {
+	var searchField = document.getElementById("search");
+	searchField.focus();
+	// chrome.storage.sync.get(['yurl'], function (result) {
+	// 	console.log('Value currently is ' + result.yurl);
+	// 	var yurl_cache = JSON.parse(result.yurl);
+	// 	var now = new Date().getTime().toString();
+	// 	if (yurl_cache && yurl_cache.search && yurl_cache.results && yurl_cache.timestamp && ((now - yurl_cache.timestamp.toString()) < 120000)) {
+	// 		// $('#search').val(yurl_cache.search);
+	// 		searchField.value = yurl_cache.search;
+	// 		document.getElementById('bookmarks').innerHTML = yurl_cache.results;
+	// 	}
+	// });
+
+
+
+	$('#history').on('click', function () {
 		$('#bookmarks').empty();
 		chrome.bookmarks.getRecent(100, renderTheResults);
 	});
-	$('#search').keyup(function() {
-		delay(function() {
+	$('#search').keyup(function () {
+		delay(function () {
 			$('#bookmarks').empty();
 			query = $('#search').val();
 			chrome.bookmarks.search(query, renderTheResults);
 		}, 400);
+
+		// yurl_cache = JSON.stringify({
+		// 	search: $('#search').val(),
+		// 	results: myHTMLString,
+		// 	timestamp: new Date().getTime()
+		// });
+		// chrome.storage.sync.set({ 'yurl': yurl_cache }, function () {
+		// 	console.log('yurl saved: ' + yurl_cache);
+		// });
 		// End keyup callback
+
 	});
-	$(document).on('click.delete', '.delete', function(e) {
+	$(document).on('click.delete', '.delete', function (e) {
 		e.preventDefault();
 		var $this = $(this);
 		var $thisLI = $(this).parents('li.bookmark');
@@ -94,9 +110,9 @@ jQuery(function($) {
 			backgroundColor: '#FFFFFF',
 			color: '#000000',
 			borderColor: '#FFFFFF'
-		}, "slow", function() {
-			chrome.bookmarks.remove(nodeid.toString(), function() {
-				$thisLI.html('<p>Bookmark deleted...</p>').fadeOut(5000, function() {
+		}, "slow", function () {
+			chrome.bookmarks.remove(nodeid.toString(), function () {
+				$thisLI.html('<p>Bookmark deleted...</p>').fadeOut(5000, function () {
 					$(this).remove();
 					total = $('.bookmark').length;
 					$('#total').text(total + ' urls');
@@ -106,7 +122,7 @@ jQuery(function($) {
 		return false;
 	});
 	// Keyboard Interaction
-	$(document).on('keydown', '.bookmark', function(e) {
+	$(document).on('keydown', '.bookmark', function (e) {
 		e = window.event ? event : e;
 		if (e.which === 38) {
 			// Arrow Up
@@ -138,12 +154,12 @@ jQuery(function($) {
 		e.preventDefault();
 		return false;
 	});
-	$(document).on('click', '.bookmark', function() {
+	$(document).on('click', '.bookmark', function () {
 		chrome.tabs.create({
 			url: $(this).find('a').attr('href')
 		});
 	});
-	chrome.omnibox.onInputEntered.addListener(function(text) {
-		navigate(text, "newForegroundTab");
-	});
+	// chrome.omnibox.onInputEntered.addListener(function (text) {
+	// 	navigate(text, "newForegroundTab");
+	// });
 });

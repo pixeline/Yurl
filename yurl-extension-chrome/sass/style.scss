@@ -117,15 +117,14 @@ body{
 	width: 100%;
 	list-style: none;
 	* {
-		-webkit-transition: all 350ms cubic-bezier(.7, .5, .3, 1);
+		transition: all 350ms cubic-bezier(.7, .5, .3, 1);
 	}
 	li.bookmark{
-		-webkit-backface-visibility: hidden;
-		-webkit-transform-style: preserve-3d;
-		-webkit-transition: all 600ms cubic-bezier(.3, .7, .1, 1);
-		-webkit-transform-origin: 50% 0;
-		-webkit-perspective: 350px;
-		-webkit-perspective: 420px;
+		backface-visibility: hidden;
+		transform-style: preserve-3d;
+		transition: all 600ms cubic-bezier(.3, .7, .1, 1);
+		transform-origin: 50% 0;
+		perspective: 420px;
 		text-decoration: none;
 		height:26px;
 		display:block;
@@ -144,7 +143,7 @@ body{
 			font-size: 13px;
 			font-weight: normal;
 			padding: 2px 5px;
-			-webkit-backface-visibility: hidden;
+			backface-visibility: hidden;
 		}
 		img.favicon{
 
@@ -161,9 +160,9 @@ body{
 			line-height: 25px;
 			text-overflow: ellipsis;
 			white-space: nowrap;
-			-webkit-transform: rotateX(-60deg);
-			-webkit-transform-origin: 50% 0;
-			-webkit-backface-visibility: visible;
+			transform: rotateX(-60deg);
+			transform-origin: 50% 0;
+			backface-visibility: visible;
 			span.delete{
 				width:11px;
 				height:13px;
@@ -190,7 +189,7 @@ body{
 				outline: 1px solid transparent;
 				background: $black;
 				color:$yellow;
-				-webkit-transform: rotateX(0deg);
+				transform: rotateX(0deg);
 			}
 		}
 	}

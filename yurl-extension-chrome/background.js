@@ -4,7 +4,7 @@ function updateBookmarkCount() {
 	var bookmarkCounter = 0;
 
 	function countBookmarks(bookmarks) {
-		bookmarks.forEach(function(bookmark) {
+		bookmarks.forEach(function (bookmark) {
 			if (bookmark.url) {
 				bookmarkCounter += 1;
 			}
@@ -13,9 +13,9 @@ function updateBookmarkCount() {
 			}
 		});
 	}
-	chrome.bookmarks.getTree(function(bookmarks) {
+	chrome.bookmarks.getTree(function (bookmarks) {
 		countBookmarks(bookmarks);
-		console.log("et voilà, bookmarkCount = " + bookmarkCounter);
+		console.log("BookmarkCount = " + bookmarkCounter);
 		chrome.browserAction.setBadgeBackgroundColor({
 			color: '#111111'
 		});
@@ -26,10 +26,10 @@ function updateBookmarkCount() {
 }
 updateBookmarkCount();
 // Update badge when bookmarks are added/removed
-chrome.bookmarks.onCreated.addListener(function(){
+chrome.bookmarks.onCreated.addListener(function () {
 	updateBookmarkCount();
 });
-chrome.bookmarks.onRemoved.addListener(function(){
+chrome.bookmarks.onRemoved.addListener(function () {
 	updateBookmarkCount();
 });
 /*

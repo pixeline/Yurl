@@ -262,7 +262,8 @@ select {
  *    `input` and others.
  */
 button,
-html input[type="button"], input[type="reset"],
+html input[type="button"],
+input[type="reset"],
 input[type="submit"] {
   -webkit-appearance: button;
   /* 2 */
@@ -398,9 +399,7 @@ body {
     border: 1px solid black;
     padding: 2px 6px;
     border-radius: 3px; }
-    #searchform #history:hover,
-    #searchform #history:active,
-    #searchform #history:focus {
+    #searchform #history:hover, #searchform #history:active, #searchform #history:focus {
       background: #FFF;
       color: #111; }
 
@@ -427,14 +426,13 @@ body {
   width: 100%;
   list-style: none; }
   #bookmarkslist * {
-    -webkit-transition: all 350ms cubic-bezier(0.7, 0.5, 0.3, 1); }
+    transition: all 350ms cubic-bezier(0.7, 0.5, 0.3, 1); }
   #bookmarkslist li.bookmark {
-    -webkit-backface-visibility: hidden;
-    -webkit-transform-style: preserve-3d;
-    -webkit-transition: all 600ms cubic-bezier(0.3, 0.7, 0.1, 1);
-    -webkit-transform-origin: 50% 0;
-    -webkit-perspective: 350px;
-    -webkit-perspective: 420px;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+    transition: all 600ms cubic-bezier(0.3, 0.7, 0.1, 1);
+    transform-origin: 50% 0;
+    perspective: 420px;
     text-decoration: none;
     height: 26px;
     display: block;
@@ -452,7 +450,7 @@ body {
       font-size: 13px;
       font-weight: normal;
       padding: 2px 5px;
-      -webkit-backface-visibility: hidden; }
+      backface-visibility: hidden; }
     #bookmarkslist li.bookmark img.favicon {
       margin-right: 5px;
       vertical-align: middle; }
@@ -466,9 +464,9 @@ body {
       line-height: 25px;
       text-overflow: ellipsis;
       white-space: nowrap;
-      -webkit-transform: rotateX(-60deg);
-      -webkit-transform-origin: 50% 0;
-      -webkit-backface-visibility: visible; }
+      transform: rotateX(-60deg);
+      transform-origin: 50% 0;
+      backface-visibility: visible; }
       #bookmarkslist li.bookmark p span.delete {
         width: 11px;
         height: 13px;
@@ -480,19 +478,13 @@ body {
         #bookmarkslist li.bookmark p span.delete:hover {
           background: transparent url("trash-icon-hover.png") top left no-repeat;
           cursor: pointer; }
-    #bookmarkslist li.bookmark:hover,
-    #bookmarkslist li.bookmark:active,
-    #bookmarkslist li.bookmark:focus {
+    #bookmarkslist li.bookmark:hover, #bookmarkslist li.bookmark:active, #bookmarkslist li.bookmark:focus {
       height: 59px; }
-      #bookmarkslist li.bookmark:hover h3,
-      #bookmarkslist li.bookmark:active h3,
-      #bookmarkslist li.bookmark:focus h3 {
+      #bookmarkslist li.bookmark:hover h3, #bookmarkslist li.bookmark:active h3, #bookmarkslist li.bookmark:focus h3 {
         background: #F8E71C;
         color: #111; }
-      #bookmarkslist li.bookmark:hover p,
-      #bookmarkslist li.bookmark:active p,
-      #bookmarkslist li.bookmark:focus p {
+      #bookmarkslist li.bookmark:hover p, #bookmarkslist li.bookmark:active p, #bookmarkslist li.bookmark:focus p {
         outline: 1px solid transparent;
         background: #111;
         color: #F8E71C;
-        -webkit-transform: rotateX(0deg); }
+        transform: rotateX(0deg); }
