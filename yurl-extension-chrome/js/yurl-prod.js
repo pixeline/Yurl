@@ -9813,7 +9813,9 @@ if ( !noGlobal ) {
 return jQuery;
 }));
 
+var query, myHTMLString, total = 0;
 var chrome = chrome;
+
 String.prototype.trunc = String.prototype.trunc ||
 	function (n) {
 		return this.length > n ? this.substr(0, n - 1) + '&hellip;' : this;
@@ -9866,7 +9868,14 @@ renderTheResults = function (results) {
 	//THIS IS FASTER THAN JQUERY'S HTML() function
 	document.getElementById('bookmarks').innerHTML = myHTMLString;
 
-
+	var yurl_cache = JSON.stringify({
+		search: query,
+		results: myHTMLString,
+		timestamp: new Date().getTime()
+	});
+	chrome.storage.sync.set({ 'yurl': yurl_cache }, function () {
+		console.log('yurl query saved: ' + yurl_cache);
+	});
 	//localStorage.setItem('yurl', yurl_cache);
 }
 /*
@@ -9876,23 +9885,21 @@ renderTheResults = function (results) {
 */
 // Search the bookmarks when entering the search keyword.
 jQuery(function ($) {
-	var query = '',
-		myHTMLString = '',
-		total = 0;
 	var searchField = document.getElementById("search");
+
+	chrome.storage.sync.get(['yurl'], function (result) {
+		console.log('Value currently is ' + result.yurl);
+		var yurl_cache = JSON.parse(result.yurl);
+		var now = new Date().getTime().toString();
+		if (yurl_cache && yurl_cache.search && yurl_cache.timestamp && ((now - yurl_cache.timestamp.toString()) < 120000)) {
+			//$('#search').val(yurl_cache.search);
+			searchField.value = yurl_cache.search;
+			document.getElementById('bookmarks').innerHTML = yurl_cache.results;
+		}
+
+
+	});
 	searchField.focus();
-	// chrome.storage.sync.get(['yurl'], function (result) {
-	// 	console.log('Value currently is ' + result.yurl);
-	// 	var yurl_cache = JSON.parse(result.yurl);
-	// 	var now = new Date().getTime().toString();
-	// 	if (yurl_cache && yurl_cache.search && yurl_cache.results && yurl_cache.timestamp && ((now - yurl_cache.timestamp.toString()) < 120000)) {
-	// 		// $('#search').val(yurl_cache.search);
-	// 		searchField.value = yurl_cache.search;
-	// 		document.getElementById('bookmarks').innerHTML = yurl_cache.results;
-	// 	}
-	// });
-
-
 
 	$('#history').on('click', function () {
 		$('#bookmarks').empty();
@@ -9902,17 +9909,20 @@ jQuery(function ($) {
 		delay(function () {
 			$('#bookmarks').empty();
 			query = $('#search').val();
+
+			// var yurl_cache = JSON.stringify({
+			// 	search: query,
+			// 	results: myHTMLString,
+			// 	timestamp: new Date().getTime()
+			// });
+			// chrome.storage.sync.set({ 'yurl': yurl_cache }, function () {
+			// 	console.log('yurl query saved: ' + yurl_cache);
+			// });
+
 			chrome.bookmarks.search(query, renderTheResults);
 		}, 400);
 
-		// yurl_cache = JSON.stringify({
-		// 	search: $('#search').val(),
-		// 	results: myHTMLString,
-		// 	timestamp: new Date().getTime()
-		// });
-		// chrome.storage.sync.set({ 'yurl': yurl_cache }, function () {
-		// 	console.log('yurl saved: ' + yurl_cache);
-		// });
+
 		// End keyup callback
 
 	});
@@ -9978,5 +9988,6 @@ jQuery(function ($) {
 	// 	navigate(text, "newForegroundTab");
 	// });
 });
+
 
 // @codekit-prepend "jquery.js", "popup.js"
