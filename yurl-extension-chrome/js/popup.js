@@ -94,16 +94,6 @@ jQuery(function ($) {
 		delay(function () {
 			$('#bookmarks').empty();
 			query = $('#search').val();
-
-			// var yurl_cache = JSON.stringify({
-			// 	search: query,
-			// 	results: myHTMLString,
-			// 	timestamp: new Date().getTime()
-			// });
-			// chrome.storage.sync.set({ 'yurl': yurl_cache }, function () {
-			// 	console.log('yurl query saved: ' + yurl_cache);
-			// });
-
 			chrome.bookmarks.search(query, renderTheResults);
 		}, 400);
 
@@ -169,7 +159,4 @@ jQuery(function ($) {
 			url: $(this).find('a').attr('href')
 		});
 	});
-	// chrome.omnibox.onInputEntered.addListener(function (text) {
-	// 	navigate(text, "newForegroundTab");
-	// });
 });
