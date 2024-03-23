@@ -1,0 +1,40 @@
+{
+  "name": "YURLS : Find your urls easily",
+  "short_name": "Yurls",
+  "version": "0.2.0",
+  "manifest_version": 3,
+  "description": "Yurl helps you search through and find your bookmarks easily and with style.",
+  "homepage_url": "https://chrome.google.com/webstore/detail/yurls-your-urls-made-easy/anpcbhoofnndmkigbbnpcjbdndkcndhg",
+  "omnibox": {
+    "keyword": "@"
+  },
+  "permissions": [
+    "bookmarks",
+    "background",
+    "storage",
+    "favicon"
+  ],
+  "background": {
+    "service_worker": "service_worker.js"
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "img-src chrome://favicon; default-src 'unsafe-inline'; script-src 'self'; object-src 'self'"
+  },
+  "action": {
+    "default_title": "YURLS ( CTRL+Y (win/mac) )",
+    "default_icon": "icon16.png",
+    "default_popup": "popup.html"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["_favicon/*"],
+      "matches": ["<all_urls>"],
+      "extension_ids": ["*"]
+    }
+  ]
+}
