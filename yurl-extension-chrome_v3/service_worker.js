@@ -1,3 +1,5 @@
+const yurlStorage = { query: '', results: '', timestamp: '' };
+
 // DISPLAY TOTAL AMOUNT OF BOOKMARKS AS A BADGE...
 
 function updateBookmarkCount() {
@@ -45,21 +47,11 @@ function onUpdate() {
 	console.log("Extension Updated");
 }
 
-function getVersion() {
-	var details = chrome.app.getDetails();
-	return details.version;
-}
-// Check if the version has changed.
-var currVersion = getVersion();
-var prevVersion = chrome.storage.sync.get('yurl_version', function (data) {
-	return data.yurl_version;
-});
-if (currVersion != prevVersion) {
-	// Check if we just installed this extension.
-	if (typeof prevVersion == 'undefined') {
-		onInstall();
-	} else {
-		onUpdate();
+chrome.storage.sync.onChanged.addListener(function (changes, namespace) {
+	// Useful for debugging
+	var error = chrome.runtime.lastError;
+	if (error) {
+		// alert(error);
+		console.log(error);
 	}
-	chrome.storage.sync.set({'yurl_version': currVersion});
-}
+});

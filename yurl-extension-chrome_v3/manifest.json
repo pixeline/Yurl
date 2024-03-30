@@ -1,7 +1,7 @@
 {
   "name": "YURLS : Find your urls easily",
   "short_name": "Yurls",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "manifest_version": 3,
   "description": "Yurl helps you search through and find your bookmarks easily and with style.",
   "homepage_url": "https://chrome.google.com/webstore/detail/yurls-your-urls-made-easy/anpcbhoofnndmkigbbnpcjbdndkcndhg",

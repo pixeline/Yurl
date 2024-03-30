@@ -6,6 +6,7 @@ String.prototype.trunc = String.prototype.trunc ||
 		return this.length > n ? this.substr(0, n - 1) + '&hellip;' : this;
 	};
 
+
 function navigate(url) {
 	chrome.tabs.getSelected(null, function (tab) {
 		chrome.tabs.update(tab.id, {
@@ -41,7 +42,12 @@ renderTheResults = function (results) {
 				// handle bookmarklets correctly
 				node.url = (node.url.length < 1) ? node.title(substring(0, 1)).toUpperCase() : node.url;
 				node.descr = (node.url.substring(0, 10) === "javascript") ? 'Bookmarklet' : node.url;
-				node.favicon = (node.descr === 'Bookmarklet') ? '' : '<img class="favicon" src="chrome://favicon/' + node.url + '"> ';
+				// node.favicon = (node.descr === 'Bookmarklet') ? '' : '<img class="favicon" src="chrome://favicon/' + node.url + '"> ';
+				const img = document.createElement('img');
+				img.src = faviconURL(node.url);
+				img.width = 25;
+				img.style = "padding-right: 10px;";
+				node.favicon = img.outerHTML;
 				str = '<li tabindex="' + (i + 1) + '" class="bookmark"><a href="' + node.url + '"><h3>' + node.favicon + node.title + '</h3></a><p>' + node.descr.trunc(55, true) + '<span data-bookmark="' + node.id + '" class="delete" title="Delete Bookmark"></span></p></li>';
 				html.push(str);
 			}
@@ -52,16 +58,8 @@ renderTheResults = function (results) {
 	}
 
 	document.getElementById('bookmarks').innerHTML = myHTMLString;
-
-	var yurl_cache = JSON.stringify({
-		search: query,
-		results: myHTMLString,
-		timestamp: new Date().getTime()
-	});
-	chrome.storage.sync.set({ 'yurl': yurl_cache }, function () {
-		console.log('yurl query saved: ' + yurl_cache);
-	});
-	//localStorage.setItem('yurl', yurl_cache);
+	// store the results in chrome storage
+	chrome.storage.local.set({ search: query, results: myHTMLString, timestamp: new Date().getTime() });
 }
 /*
 
@@ -72,18 +70,15 @@ renderTheResults = function (results) {
 jQuery(function ($) {
 	var searchField = document.getElementById("search");
 
-	chrome.storage.sync.get(['yurl'], function (result) {
-		console.log('Value currently is ' + result.yurl);
-		var yurl_cache = JSON.parse(result.yurl);
+	chrome.storage.local.get(["results", "timestamp", "search"]).then((data) => {
+
 		var now = new Date().getTime().toString();
-		if (yurl_cache && yurl_cache.search && yurl_cache.timestamp && ((now - yurl_cache.timestamp.toString()) < 120000)) {
-			//$('#search').val(yurl_cache.search);
-			searchField.value = yurl_cache.search;
-			document.getElementById('bookmarks').innerHTML = yurl_cache.results;
+		if (data.search && data.timestamp && ((now - data.timestamp.toString()) < 120000)) {
+			searchField.value = data.search;
+			document.getElementById('bookmarks').innerHTML = data.results;
 		}
-
-
 	});
+
 	searchField.focus();
 
 	$('#history').on('click', function () {
@@ -101,62 +96,70 @@ jQuery(function ($) {
 		// End keyup callback
 
 	});
-	$(document).on('click.delete', '.delete', function (e) {
-		e.preventDefault();
-		var $this = $(this);
-		var $thisLI = $(this).parents('li.bookmark');
-		var nodeid = $this.data('bookmark');
-		$thisLI.find('*').animate({
-			backgroundColor: '#FFFFFF',
-			color: '#000000',
-			borderColor: '#FFFFFF'
-		}, "slow", function () {
-			chrome.bookmarks.remove(nodeid.toString(), function () {
-				$thisLI.html('<p>Bookmark deleted...</p>').fadeOut(5000, function () {
-					$(this).remove();
-					total = $('.bookmark').length;
-					$('#total').text(total + ' urls');
-				});
+});
+$(document).on('click.delete', '.delete', function (e) {
+	e.preventDefault();
+	var $this = $(this);
+	var $thisLI = $(this).parents('li.bookmark');
+	var nodeid = $this.data('bookmark');
+	$thisLI.find('*').animate({
+		backgroundColor: '#FFFFFF',
+		color: '#000000',
+		borderColor: '#FFFFFF'
+	}, "slow", function () {
+		chrome.bookmarks.remove(nodeid.toString(), function () {
+			$thisLI.html('<p>Bookmark deleted...</p>').fadeOut("slow", function () {
+				$(this).remove();
+				total = $('.bookmark').length;
+				$('#total').text(total + ' urls');
 			});
 		});
-		return false;
 	});
-	// Keyboard Interaction
-	$(document).on('keydown', '.bookmark', function (e) {
-		e = window.event ? event : e;
-		if (e.which === 38) {
-			// Arrow Up
+	return false;
+});
+// Keyboard Interaction
+$(document).on('keydown', '.bookmark', function (e) {
+	e = window.event ? event : e;
+	if (e.which === 38) {
+		// Arrow Up
+		$(this).prev('.bookmark').focus();
+	}
+	if (e.which === 40) {
+		// Arrow Down
+		$(this).next('.bookmark').focus();
+	}
+	if (e.which === 9) {
+		if (e.shiftKey) {
+			//  SHIFT+Tab
 			$(this).prev('.bookmark').focus();
-		}
-		if (e.which === 40) {
-			// Arrow Down
+		} else {
+			// Tab
 			$(this).next('.bookmark').focus();
 		}
-		if (e.which === 9) {
-			if (e.shiftKey) {
-				//  SHIFT+Tab
-				$(this).prev('.bookmark').focus();
-			} else {
-				// Tab
-				$(this).next('.bookmark').focus();
-			}
-		}
-		if (e.which === 46 || e.which === 8) {
-			// Delete key
-			$(this).find('.delete').trigger('click.delete');
-		}
-		if (e.which === 13 || e.which === 32) {
-			// Enter or Space -> open link
-			chrome.tabs.create({
-				url: $(this).find('a').attr('href')
-			});
-		}
-		e.preventDefault();
-		return false;
-	});
-	$(document).on('click', '.bookmark', function () {
+	}
+	if (e.which === 46 || e.which === 8) {
+		// Delete key
+		$(this).find('.delete').trigger('click.delete');
+	}
+	if (e.which === 13 || e.which === 32) {
+		// Enter or Space -> open link
 		chrome.tabs.create({
 			url: $(this).find('a').attr('href')
 		});
+	}
+	e.preventDefault();
+	return false;
+});
+$(document).on('click', '.bookmark', function () {
+	chrome.tabs.create({
+		url: $(this).find('a').attr('href')
 	});
 });
+
+
+function faviconURL(u) {
+	const url = new URL(chrome.runtime.getURL("/_favicon/"));
+	url.searchParams.set("pageUrl", u);
+	url.searchParams.set("size", "32");
+	return url.toString();
+}
