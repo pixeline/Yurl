@@ -7,7 +7,7 @@
       "uuidString" : "36CEA058-3095-4126-B717-953A90C37E8B"
     }
   ],
-  "creatorBuild" : "34564",
+  "creatorBuild" : "34576",
   "files" : {
     "\/css\/style.css" : {
       "aP" : 1,
@@ -180,6 +180,17 @@
       "oO" : 0,
       "oS" : 1
     },
+    "\/min\/service_worker-min.js" : {
+      "bF" : 0,
+      "ft" : 64,
+      "ma" : 0,
+      "mi" : 1,
+      "oA" : 0,
+      "oAP" : "\/min\/min\/service_worker-min-min.js",
+      "oF" : 0,
+      "sC" : 3,
+      "tS" : 0
+    },
     "\/popup.html" : {
       "cB" : 0,
       "ft" : 8192,
@@ -238,7 +249,7 @@
   },
   "projectAttributes" : {
     "creationDate" : 509152118,
-    "displayValue" : "yurl-extension-chrome_v3",
+    "displayValue" : "yurl-extension-chrome",
     "displayValueWasSetByUser" : 0,
     "iconImageName" : "meme-daenerys",
     "iconImageWasSetByUser" : 0
