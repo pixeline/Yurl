@@ -1,5 +1,4 @@
 var query, myHTMLString, total = 0;
-var chrome = chrome;
 
 String.prototype.trunc = String.prototype.trunc ||
 	function (n) {
@@ -40,7 +39,7 @@ renderTheResults = function (results) {
 			var className = (node.children) ? 'folder' : 'link';
 			if (className !== 'folder' && (typeof node.url !== 'undefined')) {
 				// handle bookmarklets correctly
-				node.url = (node.url.length < 1) ? node.title(substring(0, 1)).toUpperCase() : node.url;
+				node.url = (node.url.length < 1) ? node.title.substring(0, 1).toUpperCase() : node.url;
 				node.descr = (node.url.substring(0, 10) === "javascript") ? 'Bookmarklet' : node.url;
 				// node.favicon = (node.descr === 'Bookmarklet') ? '' : '<img class="favicon" src="chrome://favicon/' + node.url + '"> ';
 				const img = document.createElement('img');
@@ -60,99 +59,131 @@ renderTheResults = function (results) {
 	document.getElementById('bookmarks').innerHTML = myHTMLString;
 	// store the results in chrome storage
 	chrome.storage.local.set({ search: query, results: myHTMLString, timestamp: new Date().getTime() });
-}
+};
 /*
 
 	RUNTIME
 
 */
-// Search the bookmarks when entering the search keyword.
-jQuery(function ($) {
-	var searchField = document.getElementById("search");
+// Search the bookmarks when entering the search keyword (vanilla JS)
+document.addEventListener('DOMContentLoaded', function () {
+	var searchField = document.getElementById('search');
+	var bookmarksContainer = document.getElementById('bookmarks');
 
-	chrome.storage.local.get(["results", "timestamp", "search"]).then((data) => {
+	function updateTotal() {
+		total = document.querySelectorAll('.bookmark').length;
+		var totalEl = document.getElementById('total');
+		if (totalEl) {
+			totalEl.textContent = total + ' urls';
+		}
+	}
 
-		var now = new Date().getTime().toString();
-		if (data.search && data.timestamp && ((now - data.timestamp.toString()) < 120000)) {
+	chrome.storage.local.get(["results", "timestamp", "search"], function (data) {
+		var now = new Date().getTime();
+		if (data && data.search && data.timestamp && ((now - Number(data.timestamp)) < 120000)) {
 			searchField.value = data.search;
-			document.getElementById('bookmarks').innerHTML = data.results;
+			bookmarksContainer.innerHTML = data.results;
 		}
 	});
 
 	searchField.focus();
 
-	$('#history').on('click', function () {
-		$('#bookmarks').empty();
-		chrome.bookmarks.getRecent(100, renderTheResults);
-	});
-	$('#search').keyup(function () {
+	var historyBtn = document.getElementById('history');
+	if (historyBtn) {
+		historyBtn.addEventListener('click', function () {
+			bookmarksContainer.innerHTML = '';
+			chrome.bookmarks.getRecent(100, renderTheResults);
+		});
+	}
+
+	searchField.addEventListener('keyup', function () {
 		delay(function () {
-			$('#bookmarks').empty();
-			query = $('#search').val();
+			bookmarksContainer.innerHTML = '';
+			query = searchField.value;
 			chrome.bookmarks.search(query, renderTheResults);
 		}, 400);
-
-
-		// End keyup callback
-
 	});
-});
-$(document).on('click.delete', '.delete', function (e) {
-	e.preventDefault();
-	var $this = $(this);
-	var $thisLI = $(this).parents('li.bookmark');
-	var nodeid = $this.data('bookmark');
-	$thisLI.find('*').animate({
-		backgroundColor: '#FFFFFF',
-		color: '#000000',
-		borderColor: '#FFFFFF'
-	}, "slow", function () {
-		chrome.bookmarks.remove(nodeid.toString(), function () {
-			$thisLI.html('<p>Bookmark deleted...</p>').fadeOut("slow", function () {
-				$(this).remove();
-				total = $('.bookmark').length;
-				$('#total').text(total + ' urls');
+
+	// Delegated click: handle delete first, then bookmark open
+	document.addEventListener('click', function (e) {
+		var del = e.target.closest && e.target.closest('.delete');
+		if (del) {
+			e.preventDefault();
+			var li = del.closest('li.bookmark');
+			if (!li) return;
+			var nodeid = del.getAttribute('data-bookmark');
+			chrome.bookmarks.remove(String(nodeid), function () {
+				// simple fade-out then remove
+				li.classList.add('fade-out');
+				li.addEventListener('transitionend', function () {
+					if (li && li.parentNode) li.parentNode.removeChild(li);
+					updateTotal();
+				}, { once: true });
 			});
-		});
-	});
-	return false;
-});
-// Keyboard Interaction
-$(document).on('keydown', '.bookmark', function (e) {
-	e = window.event ? event : e;
-	if (e.which === 38) {
-		// Arrow Up
-		$(this).prev('.bookmark').focus();
-	}
-	if (e.which === 40) {
-		// Arrow Down
-		$(this).next('.bookmark').focus();
-	}
-	if (e.which === 9) {
-		if (e.shiftKey) {
-			//  SHIFT+Tab
-			$(this).prev('.bookmark').focus();
-		} else {
-			// Tab
-			$(this).next('.bookmark').focus();
+			return;
 		}
-	}
-	if (e.which === 46 || e.which === 8) {
-		// Delete key
-		$(this).find('.delete').trigger('click.delete');
-	}
-	if (e.which === 13 || e.which === 32) {
-		// Enter or Space -> open link
-		chrome.tabs.create({
-			url: $(this).find('a').attr('href')
-		});
-	}
-	e.preventDefault();
-	return false;
-});
-$(document).on('click', '.bookmark', function () {
-	chrome.tabs.create({
-		url: $(this).find('a').attr('href')
+
+		var liClick = e.target.closest && e.target.closest('li.bookmark');
+		if (liClick) {
+			e.preventDefault();
+			var a = liClick.querySelector('a');
+			if (a && a.href) {
+				chrome.tabs.create({ url: a.href });
+			}
+		}
+	});
+
+	// Keyboard Interaction on focused bookmark items
+	document.addEventListener('keydown', function (e) {
+		var li = e.target && e.target.closest && e.target.closest('li.bookmark');
+		if (!li) return;
+		var key = e.which || e.keyCode;
+		if (key === 38) {
+			// Arrow Up
+			var prev = li.previousElementSibling;
+			while (prev && !prev.classList.contains('bookmark')) prev = prev.previousElementSibling;
+			if (prev) prev.focus();
+			e.preventDefault();
+			return false;
+		}
+		if (key === 40) {
+			// Arrow Down
+			var next = li.nextElementSibling;
+			while (next && !next.classList.contains('bookmark')) next = next.nextElementSibling;
+			if (next) next.focus();
+			e.preventDefault();
+			return false;
+		}
+		if (key === 9) {
+			// Tab / Shift+Tab
+			if (e.shiftKey) {
+				var prevT = li.previousElementSibling;
+				while (prevT && !prevT.classList.contains('bookmark')) prevT = prevT.previousElementSibling;
+				if (prevT) prevT.focus();
+			} else {
+				var nextT = li.nextElementSibling;
+				while (nextT && !nextT.classList.contains('bookmark')) nextT = nextT.nextElementSibling;
+				if (nextT) nextT.focus();
+			}
+			e.preventDefault();
+			return false;
+		}
+		if (key === 46 || key === 8) {
+			// Delete or Backspace
+			var delBtn = li.querySelector('.delete');
+			if (delBtn) delBtn.click();
+			e.preventDefault();
+			return false;
+		}
+		if (key === 13 || key === 32) {
+			// Enter or Space -> open link
+			var a = li.querySelector('a');
+			if (a && a.href) {
+				chrome.tabs.create({ url: a.href });
+			}
+			e.preventDefault();
+			return false;
+		}
 	});
 });
 
