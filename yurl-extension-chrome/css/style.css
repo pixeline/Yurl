@@ -363,7 +363,7 @@ actual styling
 body {
   position: relative;
   height: 30px;
-  width: 420px;
+  width: 460px;
   background: #FFF;
   color: #333;
   font-size: 11px;
@@ -376,32 +376,70 @@ body {
   top: 0;
   left: 0;
   z-index: 100;
-  padding: 5px 5px 0;
+  padding: 0;
   width: 100%;
   height: 30px;
   border-bottom: 0px solid #333;
-  background: #F8E71C;
-  text-transform: uppercase; }
-  #searchform label {
-    margin-right: 20px;
-    font-weight: bold; }
-  #searchform #total {
-    margin-left: 1em;
-    font-weight: bold; }
-  #searchform #search {
-    padding: 2px;
-    width: 130px;
-    border: 1px solid #FFF; }
-  #searchform #history {
-    float: right;
-    background: black;
-    color: #F8E71C;
-    border: 1px solid black;
-    padding: 2px 6px;
-    border-radius: 3px; }
-    #searchform #history:hover, #searchform #history:active, #searchform #history:focus {
-      background: #FFF;
-      color: #111; }
+  text-transform: uppercase;
+  display: flex;
+  align-items: stretch; }
+  #searchform .tab {
+    display: flex;
+    align-items: center;
+    padding: 5px 8px;
+    height: 30px; }
+  #searchform .tab-search {
+    position: relative;
+    flex: 1 1 auto;
+    background: #444;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    overflow: hidden; }
+    #searchform .tab-search.active { background: #F8E71C; color: #444; }
+    #searchform .tab-search label { margin-right: 10px; font-weight: bold; }
+    #searchform .tab-search #total { margin-left: auto; font-weight: bold; }
+    #searchform .tab-search #search { padding: 2px; width: 160px; border: 1px solid #FFF; }
+  /* Square divider cell */
+  #searchform .divider {
+    position: relative;
+    flex: 0 0 30px;
+    width: 30px;
+    height: 30px;
+    background: transparent;
+    overflow: hidden;
+  }
+  /* Split square into two triangles: top black, bottom yellow */
+  #searchform .divider::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top right, #444 0 50%, #F8E71C 50% 100%);
+  }
+  /* Invert colors when Latest is active */
+  #searchform.latest-active .divider::before {
+    background: linear-gradient(to top right, #F8E71C 0 50%, #444 50% 100%);
+  }
+  #searchform .tab-latest {
+    position: relative;
+    flex: 0 0 auto;
+    min-width: 70px;
+    background: #444;
+    color: #FFF;
+    text-align: center;
+    font-weight: bold;
+    cursor: pointer; }
+    /* no notch; diagonal is handled by .separator triangle */
+    #searchform .tab-latest.active { background: #F8E71C; color: #111; }
+  #searchform .tab-search.disabled label,
+  #searchform .tab-search.disabled #total { color: rgba(255,255,255,0.6); }
+  #searchform .tab-search.disabled #search {
+    background: #666;
+    color: #999;
+    border-color: #666;
+    pointer-events: none;
+  }
 
 #bookmarks {
   margin: 0;
@@ -434,6 +472,8 @@ body {
     transform-origin: 50% 0;
     perspective: 420px;
     text-decoration: none;
+    border-bottom: 1px solid #444;
+
     height: 26px;
     display: block;
     margin: 0;
@@ -445,7 +485,7 @@ body {
     #bookmarkslist li.bookmark h3 {
       margin: 0;
       height: 25px;
-      background: #444;
+      background: #000;
       color: #FFF;
       font-size: 13px;
       font-weight: normal;

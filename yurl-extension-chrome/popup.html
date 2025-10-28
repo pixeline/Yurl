@@ -7,11 +7,14 @@
 </head>
 <body>
   <div id="searchform">
-	  <label for="search">Search Bookmarks</label>
-	  <input id="search" tabindex="0" autofocus >
-	  <span id="total"></span>
-	  <input id="history" type="button" tabindex="-1" value="Latest">
-	  </div>
+    <div id="tab-latest" class="tab tab-latest active" tabindex="0">Latest</div>
+    <div class="divider" aria-hidden="true"></div>
+    <div class="tab tab-search">
+      <label for="search">Search Bookmarks</label>
+      <input id="search" tabindex="0" autofocus >
+      <span id="total"></span>
+    </div>
+  </div>
   <div id="bookmarks"></div>
 </body>
 </html>

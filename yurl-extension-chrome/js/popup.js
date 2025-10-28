@@ -86,13 +86,65 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	});
 
-	searchField.focus();
+	function safeFocus(el) {
+		if (!el || el.disabled) return;
+		// Defer focus to avoid MV3 popup timing issues; ignore failures
+		setTimeout(function () {
+			try { el.focus({ preventScroll: true }); } catch (e) { }
+		}, 0);
+	}
+	safeFocus(searchField);
 
-	var historyBtn = document.getElementById('history');
-	if (historyBtn) {
-		historyBtn.addEventListener('click', function () {
-			bookmarksContainer.innerHTML = '';
-			chrome.bookmarks.getRecent(100, renderTheResults);
+	// Latest tab behavior
+	var latestTab = document.getElementById('tab-latest');
+	var tabSearch = document.querySelector('#searchform .tab-search');
+	var searchForm = document.getElementById('searchform');
+
+	function renderSearchForCurrentInput() {
+		bookmarksContainer.innerHTML = '';
+		var value = searchField && searchField.value ? searchField.value.trim() : '';
+		query = value;
+		if (value) {
+			chrome.bookmarks.search(value, renderTheResults);
+		} else {
+			var totalEl = document.getElementById('total');
+			if (totalEl) totalEl.textContent = '0 urls';
+		}
+	}
+	function activateSearchTab() {
+		tabSearch.classList.add('active');
+		latestTab.classList.remove('active');
+		tabSearch.classList.remove('disabled');
+		if (searchField) searchField.disabled = false;
+		safeFocus(searchField);
+		if (searchForm) searchForm.classList.remove('latest-active');
+	}
+	function activateLatestTab() {
+		tabSearch.classList.remove('active');
+		latestTab.classList.add('active');
+		tabSearch.classList.add('disabled');
+		if (searchField) {
+			searchField.disabled = true;
+			if (typeof searchField.blur === 'function') searchField.blur();
+		}
+		if (searchForm) searchForm.classList.add('latest-active');
+	}
+	function showLatest() {
+		bookmarksContainer.innerHTML = '';
+		activateLatestTab();
+		chrome.bookmarks.getRecent(100, renderTheResults);
+	}
+	if (latestTab) {
+		latestTab.addEventListener('click', showLatest);
+	}
+	if (tabSearch) {
+		tabSearch.addEventListener('click', function () {
+			if (latestTab.classList.contains('active')) {
+				// when latest is active, clicking anywhere in search tab reactivates search
+				activateSearchTab();
+				searchField.focus();
+				renderSearchForCurrentInput();
+			}
 		});
 	}
 
@@ -101,6 +153,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			bookmarksContainer.innerHTML = '';
 			query = searchField.value;
 			chrome.bookmarks.search(query, renderTheResults);
+			activateSearchTab();
 		}, 400);
 	});
 
@@ -185,6 +238,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			return false;
 		}
 	});
+	// Default view: Latest first on load
+	showLatest();
 });
 
 
